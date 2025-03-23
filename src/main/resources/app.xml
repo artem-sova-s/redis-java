@@ -3,5 +3,4 @@
 <properties>
     <entry key="server.host">127.0.0.1</entry>
     <entry key="server.port">6379</entry>
-    <entry key="logging.level">debug</entry>
 </properties>
