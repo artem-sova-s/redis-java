@@ -15,6 +15,10 @@ This project explores low-level networking using sockets, custom protocol parsin
 - Build a minimal, testable Redis-like server from scratch
 
 ## Getting Started
+To run tests:
+```bash
+mvn test -X 
+```
 
 To run the server locally:
 
@@ -26,4 +30,10 @@ To run the server locally:
 # For Linux/MAC
 ```bash
 ./run.sh
+```
+
+# Run in the docker
+```bash
+docker build . -t rediska
+docker run -d -p 6379:6379 --name rediska rediska
 ```
