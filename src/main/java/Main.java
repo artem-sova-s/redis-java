@@ -1,51 +1,36 @@
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import network.RedisServer;
+import config.Config;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 
 public class Main {
     private static final Logger log = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        ServerSocket serverSocket;
-        Socket clientSocket = null;
-        final int port = 6379;
-
-        log.info("Starting on port " + port);
+        Config config = null;
 
         try {
-            serverSocket = new ServerSocket(port);
-            // Since the tester restarts your program quite often, setting SO_REUSEADDR
-            // ensures that we don't run into 'Address already in use' errors
-            serverSocket.setReuseAddress(true);
-            // Wait for connection from client.
-            clientSocket = serverSocket.accept();
+            config = Config.getConfig();
+        } catch (IllegalArgumentException e) {
+            log.error("Error while parsing config: ", e);
+            System.exit(1);
+        }
 
-            BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        RedisServer redisServer = null;
+        try {
+            redisServer = new RedisServer();
+            redisServer.start(config.getInt("server.port"));
 
-            // init of the output stream
-            OutputStream outputStream = clientSocket.getOutputStream();
-            String userMessage = null;
-
-            while ((userMessage = inputStream.readLine()) != null) {
-                // read the input stream into string
-                System.out.println(userMessage);
-                // creates response message
-                byte[] responseMessage = "+PONG\r\n".getBytes();
-
-                outputStream.write(responseMessage);
-            }
         } catch (IOException e) {
-            System.out.println("IOException: " + e.getMessage());
+            System.out.println("Failed to start redisServer: " + e.getMessage());
         } finally {
             try {
-                if (clientSocket != null) {
-                    clientSocket.close();
-                }
+                redisServer.stop();
             } catch (IOException e) {
-                System.out.println("IOException: " + e.getMessage());
+                System.out.println("Failed to stop redisServer: " + e.getMessage());
             }
         }
     }
