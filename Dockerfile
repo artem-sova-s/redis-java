@@ -4,9 +4,10 @@ WORKDIR /build
 
 COPY pom.xml .
 COPY src ./src
+COPY build.sh .
 
 # build skipping tests
-RUN mvn clean package -D skipTests
+RUN ./build.sh
 
 FROM eclipse-temurin:23-jdk-alpine
 
@@ -14,7 +15,7 @@ FROM eclipse-temurin:23-jdk-alpine
 WORKDIR /app
 
 # copy jar file from the builder
-COPY --from=builder /builder/target/*.jar app.jar
+COPY --from=builder /build/target/*.jar app.jar
 
 # expose the port redis is running on
 EXPOSE 6379

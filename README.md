@@ -15,7 +15,7 @@ This project explores low-level networking using sockets, custom protocol parsin
 - Build a minimal, testable Redis-like server from scratch
 
 ## Getting Started
-To run tests:
+To run tests directly:
 ```bash
 mvn test -X 
 ```
@@ -24,12 +24,17 @@ To run the server locally:
 
 # For Windows
 ```bash
-./run.bat
+# runs with tests
+./build.bat
 ```
 
 # For Linux/MAC
 ```bash
-./run.sh
+# runs skipping tests
+./build.sh
+
+# runs with tests
+./test_n_build.sh
 ```
 
 # Run in the docker
