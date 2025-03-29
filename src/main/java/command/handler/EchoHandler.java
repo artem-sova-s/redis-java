@@ -9,7 +9,7 @@ import utils.network.CommandStatus;
 
 
 public class EchoHandler extends CommandHandler {
-    private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(EchoHandler.class);
 
     public EchoHandler(final CommandHandler next) {
         super(next);

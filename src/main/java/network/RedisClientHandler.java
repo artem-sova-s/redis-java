@@ -19,7 +19,7 @@ import java.net.Socket;
 
 
 public class RedisClientHandler implements Runnable {
-    private static final Logger log = LoggerFactory.getLogger(RedisServer.class);
+    private static final Logger log = LoggerFactory.getLogger(RedisClientHandler.class);
 
     private Socket clientSocket;
     private OutputStream outputStream;

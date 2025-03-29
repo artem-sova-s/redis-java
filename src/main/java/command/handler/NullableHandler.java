@@ -9,7 +9,7 @@ import utils.network.CommandStatus;
 import java.io.IOException;
 
 public class NullableHandler extends CommandHandler {
-    private static final Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static final Logger log = LoggerFactory.getLogger(NullableHandler.class);
 
     public NullableHandler(CommandHandler next) {
         super(next);

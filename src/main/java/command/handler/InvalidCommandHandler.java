@@ -9,7 +9,7 @@ import java.io.IOException;
 
 // goes at the end of the pipeline and called when no more other command is called in the pipeline
 public class InvalidCommandHandler extends CommandHandler {
-    private static final Logger log = LoggerFactory.getLogger(CommandContext.class);
+    private static final Logger log = LoggerFactory.getLogger(InvalidCommandHandler.class);
 
     public InvalidCommandHandler() { super(); }
 

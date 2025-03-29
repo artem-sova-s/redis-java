@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import utils.network.CommandStatus;
 
 public class PingHandler extends CommandHandler {
-    private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(PingHandler.class);
 
     public PingHandler(CommandHandler next) {
         super(next);

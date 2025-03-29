@@ -1,13 +1,11 @@
 package command.handler;
 
-import network.RedisServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.Socket;
 
 public class CommandHandlerFactory {
-    private static final Logger log = LoggerFactory.getLogger(RedisServer.class);
+    private static final Logger log = LoggerFactory.getLogger(CommandHandlerFactory.class);
 
     public static CommandHandler createPipeline() {
         InvalidCommandHandler invalidCommandHandler = new InvalidCommandHandler();
