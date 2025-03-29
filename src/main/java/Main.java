@@ -22,16 +22,12 @@ public class Main {
         RedisServer redisServer = null;
         try {
             redisServer = new RedisServer();
-            redisServer.start(config.getInt("server.port"));
+            redisServer.start(config.getInt("server.port"), config.getInt("server.thread_pool.size"));
 
         } catch (IOException e) {
             System.out.println("Failed to start redisServer: " + e.getMessage());
         } finally {
-            try {
-                redisServer.stop();
-            } catch (IOException e) {
-                System.out.println("Failed to stop redisServer: " + e.getMessage());
-            }
+            redisServer.stop();
         }
     }
 }

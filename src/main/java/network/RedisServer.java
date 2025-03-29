@@ -3,70 +3,56 @@ package network;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-import command.handler.CommandHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// command processing components
-import command.CommandParser;
-import command.CommandContext;
-
-import command.handler.NullableHandler;
-import command.handler.EchoHandler;
-import command.handler.InvalidCommandHandler;
 
 public class RedisServer {
     private static final Logger log = LoggerFactory.getLogger(RedisServer.class);
 
     private ServerSocket serverSocket;
-    private Socket clientSocket;
-    private OutputStream outputStream;
-    private InputStream inputStream;
+    private ExecutorService threadPool;
 
-    public void start(int port) throws IOException {
-
-        log.info("Created server socket on " + port + " port");
+    public void start(final int port, final int threadPoolSize) throws IOException {
+        log.info("Starting Redis Server on port " + port);
 
         this.serverSocket = new ServerSocket(port);
         this.serverSocket.setReuseAddress(true);
-        this.clientSocket = serverSocket.accept();
 
-        // init of the input stream
-        this.inputStream = clientSocket.getInputStream();
-        BufferedReader inputReader = new BufferedReader(new InputStreamReader(inputStream));
-        log.debug("Got input stream");
+        // creation of the thread pool
+        this.threadPool = Executors.newFixedThreadPool(threadPoolSize);
 
-        outputStream = clientSocket.getOutputStream();
-        log.debug("Got output stream");
+        while(true) {
+            Socket socket = this.serverSocket.accept();
+            log.debug("New connection from " + socket.getRemoteSocketAddress());
 
-        // command handler pipeline creation
-        CommandHandler commandHandler = new NullableHandler(new EchoHandler(new InvalidCommandHandler()));
-        log.debug("Got command handler");
-
-        CommandParser commandParser = new CommandParser();
-        CommandContext commandContext = null;
-
-        String clientMessage = null;
-        while ((clientMessage = inputReader.readLine()) != null) {
-            log.debug("Parsing command");
-            // parse the command
-            commandContext = commandParser.parse(clientMessage, outputStream);
-
-            log.debug("Handling command");
-            commandHandler.handle(commandContext);
+            this.threadPool.submit(new RedisClientHandler(socket));
         }
     }
 
-    public void stop() throws IOException {
-        // Defensive close operations
+    public void stop() {
+        this.threadPool.shutdown();
+
         try {
-            if (inputStream != null) inputStream.close();
-            if (outputStream != null) outputStream.close();
-            if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close();
-            if (serverSocket != null && !serverSocket.isClosed()) serverSocket.close();
-        } catch (IOException e) {
-            log.error("Error while closing resources" + e);
+            if (!this.threadPool.awaitTermination(20, TimeUnit.SECONDS)) {
+                this.threadPool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            this.threadPool.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+
+        if (this.serverSocket != null && !this.serverSocket.isClosed()) {
+            try {
+                this.serverSocket.close();
+            } catch (IOException e) {
+                log.error("Failed to close socket connection: ", e.getMessage());
+                System.exit(1);
+            }
         }
     }
 }
