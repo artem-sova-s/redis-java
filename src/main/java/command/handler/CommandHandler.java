@@ -1,9 +1,9 @@
-package network.handler;
+package command.handler;
 
 import java.io.IOException;
 
 // CommandContext import
-import network.handler.CommandContext;
+import command.CommandContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,29 +24,32 @@ import org.slf4j.LoggerFactory;
 public abstract class CommandHandler {
     private static final Logger log = LoggerFactory.getLogger(CommandHandler.class);
 
-    protected CommandHandler next = null;
+    protected CommandHandler next;
 
-    public void setNext(CommandHandler next) {
+    public CommandHandler(final CommandHandler next) {
         this.next = next;
+    }
+
+    public CommandHandler() {
+        this.next = null;
     }
 
     public void handle(final CommandContext context) {
         try {
             if (this.canHandle(context.getCommand())) {
-                context.incrementExecutedCommandCounter();
                 process(context);
+                return;
             }
 
-            // if no next node and in pipeline no command was executed
-            // then command is unknown
-            if (next == null && context.getExecutedCommandCounter() == 0) {
-                context.getOutputStream().write("UNKNOWN COMMAND\r\n".getBytes());
+            // if no next command, then exit
+            if (next == null) {
+                return;
             }
-            
+
             this.next.handle(context);
 
         } catch (IOException e) {
-            log.error("Failed to write to the output stream", e.getMessage());
+            log.error("Failed to write to the output stream" + e.getMessage());
         }
     }
 
