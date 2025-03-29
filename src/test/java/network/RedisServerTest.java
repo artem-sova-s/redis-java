@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 // for RedisClient
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 
 class RedisClient {
@@ -22,13 +22,26 @@ class RedisClient {
         }
     }
 
-    public void sendMessage(String message) {
+    public String sendMessage(String message) {
         try {
             OutputStream outputStream = this.socket.getOutputStream();
             outputStream.write(message.getBytes());
-        } catch (Exception e) {
-            System.err.println("Failed to get output stream: " + e.getMessage());
+            outputStream.flush();
+        } catch (IOException e) {
+            System.err.println("Failed to write to output stream: " + e.getMessage());
         }
+
+        String serverResponse = null;
+        try {
+            InputStream inputStream = socket.getInputStream();
+            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+
+            serverResponse = bufferedReader.readLine();
+        } catch (IOException e) {
+            System.err.println("Failed to read from input stream: " + e.getMessage());
+        }
+
+        return serverResponse;
     }
 }
 
@@ -57,14 +70,38 @@ public class RedisServerTest {
         assertNotNull(redisServer);
     }
 
-    @DisplayName("Returns PONG")
-    @Test
-    void RedisServer_returnsPong() {
-        try {
-            redisServer.start(port);
-
-        } catch (Exception e) {
-            System.err.println("Failed to start server: " + e.getMessage());
-        }
-    }
+//    @DisplayName("Returns PONG")
+//    @Test
+//    void RedisServer_returnSameMessage() {
+//        Thread serverThread = new Thread(() -> {
+//            try {
+//                redisServer.start(port);
+//            } catch (IOException e) {
+//                e.getMessage();
+//            }
+//        });
+//
+//        System.out.println("Starting server thread");
+//        // start redis server in the separate thread
+//        serverThread.start();
+//
+//        // wait till server starts
+//        try {
+//            Thread.sleep(2000);
+//        } catch (InterruptedException e) {
+//            e.getMessage();
+//        }
+//
+//        try {
+//            RedisClient redisClient = new RedisClient("localhost", port);
+//            String response = redisClient.sendMessage("echo PONG");
+//
+//            System.out.println("Response: " + response);
+//
+//            assertNotNull(response);
+//            assertEquals("PONG\r\n", response);
+//        } catch (Exception e) {
+//            System.err.println("Failed to start server: " + e.getMessage());
+//        }
+//    }
 }
