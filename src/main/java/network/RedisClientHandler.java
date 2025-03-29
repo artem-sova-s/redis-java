@@ -11,6 +11,7 @@ import command.CommandContext;
 import command.handler.NullableHandler;
 import command.handler.EchoHandler;
 import command.handler.InvalidCommandHandler;
+import command.handler.PingHandler;
 
 import java.io.*;
 import java.net.Socket;
@@ -38,7 +39,7 @@ public class RedisClientHandler implements Runnable {
             log.debug("Got output stream");
 
             // command handler pipeline creation
-            CommandHandler commandHandler = new NullableHandler(new EchoHandler(new InvalidCommandHandler()));
+            CommandHandler commandHandler = new NullableHandler(new PingHandler(new EchoHandler(new InvalidCommandHandler())));
             log.debug("Got command handler");
 
             CommandParser commandParser = new CommandParser();
