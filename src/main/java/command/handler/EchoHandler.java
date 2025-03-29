@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.network.CommandStatus;
 
 
 public class EchoHandler extends CommandHandler {
@@ -24,7 +25,7 @@ public class EchoHandler extends CommandHandler {
     }
 
     @Override
-    protected void process(CommandContext context) throws IOException {
+    protected CommandStatus process(CommandContext context) throws IOException {
         log.debug("Can handle command: " + context.getCommand() + context.getCommandArgs().toString());
 
         try {
@@ -35,5 +36,6 @@ public class EchoHandler extends CommandHandler {
         } catch (NullPointerException e) {
             log.error("NullPointerException while processing command" + e.getMessage());
         }
+        return CommandStatus.CONTINUE;
     }
 }

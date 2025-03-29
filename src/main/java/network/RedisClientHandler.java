@@ -11,6 +11,9 @@ import command.CommandContext;
 // pipeline command handler factory
 import command.handler.CommandHandlerFactory;
 
+// command execution result enum
+import utils.network.CommandStatus;
+
 import java.io.*;
 import java.net.Socket;
 
@@ -52,19 +55,32 @@ public class RedisClientHandler implements Runnable {
                 commandContext = commandParser.parse(clientMessage, outputStream);
 
                 log.debug("Handling command");
-                commandHandler.handle(commandContext);
+                CommandStatus status = commandHandler.handle(commandContext);
+                log.debug("Command status: " + status.toString());
+
+                // is the command execution return code is EXIT then close connection and exit the thread
+                if (status == CommandStatus.EXIT) {
+                    log.info("Exiting the thread...");
+                    break;
+                }
             }
         } catch (IOException e) {
             log.error("Failed to handle client", e.getMessage());
         } finally {
             // Defensive close operations
-            try {
-                if (inputStream != null) inputStream.close();
-                if (outputStream != null) outputStream.close();
-                if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close();
-            } catch (IOException e) {
-                log.error("Error while closing resources" + e);
-            }
+            exitThread();
+        }
+    }
+
+    private void exitThread() {
+        try {
+            if (inputStream != null) inputStream.close();
+            if (outputStream != null) outputStream.close();
+            if (clientSocket != null && !clientSocket.isClosed()) clientSocket.close();
+            Thread.currentThread().interrupt();
+            return;
+        } catch (IOException e) {
+            log.error("Error while closing resources" + e.getMessage());
         }
     }
 }

@@ -5,6 +5,9 @@ import java.io.IOException;
 // CommandContext import
 import command.CommandContext;
 
+// command execution result enum
+import utils.network.CommandStatus;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,26 +37,26 @@ public abstract class CommandHandler {
         this.next = null;
     }
 
-    public void handle(final CommandContext context) {
+    public CommandStatus handle(final CommandContext context) {
         try {
             if (this.canHandle(context.getCommand())) {
-                process(context);
-                return;
+                return process(context);
             }
 
             // if no next command, then exit
             if (next == null) {
-                return;
+                return CommandStatus.CONTINUE;
             }
 
-            this.next.handle(context);
+            return this.next.handle(context);
 
         } catch (IOException e) {
             log.error("Failed to write to the output stream" + e.getMessage());
         }
+        return CommandStatus.CONTINUE;
     }
 
     protected abstract boolean canHandle(String command);
 
-    protected abstract void process(final CommandContext context) throws IOException;
+    protected abstract CommandStatus process(final CommandContext context) throws IOException;
 }

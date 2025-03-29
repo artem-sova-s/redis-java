@@ -4,6 +4,7 @@ import command.CommandContext;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.network.CommandStatus;
 
 import java.io.IOException;
 
@@ -26,7 +27,7 @@ public class NullableHandler extends CommandHandler {
     }
 
     @Override
-    protected void process(CommandContext context) {
-        return;
+    protected CommandStatus process(CommandContext context) {
+        return CommandStatus.CONTINUE;
     }
 }

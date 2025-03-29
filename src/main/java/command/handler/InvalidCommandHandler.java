@@ -3,6 +3,7 @@ package command.handler;
 import command.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.network.CommandStatus;
 
 import java.io.IOException;
 
@@ -18,12 +19,12 @@ public class InvalidCommandHandler extends CommandHandler {
     }
 
     @Override
-    protected void process(final CommandContext context) throws IOException {
+    protected CommandStatus process(final CommandContext context) throws IOException {
         try {
             context.getOutputStream().write("UNKNOWN COMMAND\r\n".getBytes());
         } catch (IOException e) {
             log.error("Failed to write to output stream in InvalidCommandHandler: " + e.getMessage());
         }
+        return CommandStatus.CONTINUE;
     }
-
 }

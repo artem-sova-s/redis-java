@@ -4,6 +4,7 @@ import command.CommandContext;
 import network.RedisServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utils.network.CommandStatus;
 
 import java.io.IOException;
 
@@ -20,8 +21,9 @@ public class ExitHandler extends CommandHandler {
     }
 
     @Override
-    protected void process(CommandContext context) throws IOException {
-        // TODO: implement connection interrupt and thread exit
-        return;
+    protected CommandStatus process(CommandContext context) throws IOException {
+        log.info("Exit command");
+        context.getOutputStream().write("EXIT\r\n".getBytes());
+        return CommandStatus.EXIT;
     }
 }
