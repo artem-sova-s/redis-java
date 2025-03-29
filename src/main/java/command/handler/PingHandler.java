@@ -16,7 +16,7 @@ public class PingHandler extends CommandHandler {
 
     @Override
     protected boolean canHandle(String command) {
-        return command.equals("PING");
+        return command.equalsIgnoreCase("ping");
     }
 
     @Override
